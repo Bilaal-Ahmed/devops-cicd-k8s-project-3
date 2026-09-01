@@ -1,0 +1,83 @@
+replicaCount: 3
+
+image:
+  repository: bilaalahmed/devops-cicd-k8s-project-3
+  pullPolicy: Always
+  tag: "latest"
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  runAsNonRoot: true
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: true
+
+httpRoute:
+  enabled: false
+  parentRefs: []
+  hostnames: []
+  ules: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+volumes: []
+
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
