@@ -31,9 +31,10 @@ jobs:
       - name: Run tests
         working-directory: app
         run: npm test
-
+    
+        
   docker:
-    name: Build Docker Image
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
     needs: test
 
@@ -41,5 +42,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build Docker image
-        run: docker build -t devops-project-3:${{ github.sha }} .
+        run: |
+          docker build \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-cicd-k8s-project-3:${{ github.sha }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-cicd-k8s-project-3:latest \
+            .
+
+      - name: Push Docker images
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/devops-cicd-k8s-project-3:${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/devops-cicd-k8s-project-3:latest
