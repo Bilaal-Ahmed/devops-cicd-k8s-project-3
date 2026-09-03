@@ -42,7 +42,7 @@ httpRoute:
   enabled: false
   parentRefs: []
   hostnames: []
-  ules: []
+  rules: []
 
 resources:
   requests:
