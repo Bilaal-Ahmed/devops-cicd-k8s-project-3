@@ -15,26 +15,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v4
+      - name: Copy Helm chart to EC2
+        uses: appleboy/scp-action@v1
         with:
-          version: latest
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "helm/devops-app"
+          target: "/home/ubuntu/devops-cicd-k8s-project-3"
 
-      - name: Configure Kubernetes
-        run: |
-          mkdir -p ~/.kube
-          printf '%s' '${{ secrets.KUBE_CONFIG }}' > ~/.kube/config
-          chmod 600 ~/.kube/config
+      - name: Deploy to Kubernetes
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            export KUBECONFIG=/home/ubuntu/.kube/config
 
-      - name: Setup Helm
-        uses: azure/setup-helm@v4
+            cd /home/ubuntu/devops-cicd-k8s-project-3
 
-      - name: Deploy with Helm
-        run: |
-          helm upgrade --install devops-app ./helm/devops-app \
-            --set image.tag=latest
+            helm upgrade --install devops-app ./helm/devops-app \
+              --set image.tag=latest
 
-      - name: Verify deployment
-        run: |
-          kubectl rollout status deployment/devops-app
-          kubectl get pods
+            kubectl rollout status deployment/devops-app
+            kubectl get pods
