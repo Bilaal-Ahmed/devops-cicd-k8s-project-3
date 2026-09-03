@@ -31,8 +31,7 @@ jobs:
       - name: Run tests
         working-directory: app
         run: npm test
-    
-        
+
   docker:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
